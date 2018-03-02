@@ -2,15 +2,15 @@ FROM python:alpine3.7
 
 LABEL maintainer K.Naito
 
-ENV CHANNEL_SECRET=93c57484b48ecc584fcfbacd7fed5087 \
-    ACCESS_TOKEN=0IOGfO9CedLZreFoGW8EWg2ObVeriKNABl8G4uT5jUR5efEaFnknUEjBOYy+twd7uR1N04vwNd0xDi7UZ6pAXKdJs5PesiMWBphZR5bqflsiJSYQbL6dKQRbbZmb+1K/NXE2i2xkdKjJow+sjpj0uwdB04t89/1O/w1cDnyilFU= \
-    MYSQL_HOST=infonic-tokyo-rds.cak2s2vj9zrr.ap-northeast-1.rds.amazonaws.com \
-    MYSQL_USER=infonic_tokyo \
-    MYSQL_PASS=inf-TS-6310 \
-    MYSQL_PORT=3306 \
-    MYSQL_DATABASE=remindanuki \
-    REDIS_URL=inf-redis.jixro2.0001.apne1.cache.amazonaws.com \
-    REDIS_PORT=6379
+ENV CHANNEL_SECRET=YOUR_CHANNEL_SECRET \
+    ACCESS_TOKEN=YOUR_ACCESS_TOKEN \
+    MYSQL_HOST=YOUR_MYSQL_HOST \
+    MYSQL_USER=YOUR_MYSQL_USER \
+    MYSQL_PASS=YOUR_MYSQL_PASS \
+    MYSQL_PORT=YOUR_MYSQL_PORT \
+    MYSQL_DATABASE=YOUR_MYSQL_DATABASE \
+    REDIS_URL=YOUR_REDIS_URL \
+    REDIS_PORT=YOUR_REDIS_PORT
 
 RUN pip install --upgrade pip \
     && pip install flask gunicorn line-bot-sdk redis mysql-connector-python-rf pytz crontab \
