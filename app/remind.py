@@ -9,11 +9,12 @@ from pytz import timezone
 from datetime import datetime
 import mysql.connector
 import config
+import function as func
 
 line_bot_api = LineBotApi(config.ACCESS_TOKEN)
 
 # mysqlに接続
-mysql_connection = mysql.connector.connect(**config.MYSQL_CONFIG)
+mysql_connection = func.getMysqlPoolConnection()
 cursor = mysql_connection.cursor(dictionary=True)
 
 # 現在日時を取得

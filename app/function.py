@@ -8,6 +8,7 @@ from linebot.models import (
     TextSendMessage, TemplateSendMessage, ButtonsTemplate, DatetimePickerTemplateAction
 )
 import mysql.connector
+import sqlalchemy.pool as pool
 import redis
 import config
 
@@ -24,6 +25,15 @@ def reply_message(reply_token, message_object):
             reply_token,
             message_object)
 
+def getMysqlConnection():
+    con = mysql.connector.connect(**config.MYSQL_CONFIG)
+    return con
+
+def getMysqlPoolConnection():
+    mypool = pool.QueuePool(getMysqlConnection, max_overflow=10, pool_size=5)
+    con = mypool.connect()
+    return con
+
 def create_datepicker(context):
     """
     datepickerオブジェクト作成method
@@ -36,7 +46,7 @@ def create_datepicker(context):
     date_picker = TemplateSendMessage(
         alt_text='「' + context + '」をいつ教えてほしいぽん？',
         template=ButtonsTemplate(
-            text= '「' + context + '」をいつ教えてほしいぽん？',
+            text= '「' + context + '」をいつ教えてほしいぽん？\n「キャンセル」って言ってくれればやめるたぬ～',
             actions=[
                 DatetimePickerTemplateAction(
                     label='設定',
@@ -79,7 +89,7 @@ def get_remind_list(send_id):
         list: list 現在日時から近い予定から最大10件のリスト
     """
     # mysqlに接続
-    mysql_connection = mysql.connector.connect(**config.MYSQL_CONFIG)
+    mysql_connection = getMysqlPoolConnection()
     cursor = mysql_connection.cursor(dictionary=True)
 
     # 現在日時を取得
@@ -126,7 +136,7 @@ def regist_reminder(event, send_id, remind_at):
         str: context 会話から受け取った予定
     """
     # mysqlに接続
-    mysql_connection = mysql.connector.connect(**config.MYSQL_CONFIG)
+    mysql_connection = getMysqlPoolConnection()
     cursor = mysql_connection.cursor(dictionary=True)
 
     # redisから入力された予定を取得

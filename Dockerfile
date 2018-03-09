@@ -13,7 +13,7 @@ ENV CHANNEL_SECRET=YOUR_CHANNEL_SECRET \
     REDIS_PORT=YOUR_REDIS_PORT
 
 RUN pip install --upgrade pip \
-    && pip install flask gunicorn line-bot-sdk redis mysql-connector-python-rf pytz crontab \
+    && pip install flask gunicorn line-bot-sdk redis mysql-connector-python-rf pytz crontab sqlalchemy \
     && adduser -D botter \
     && mkdir /home/botter/app
 
