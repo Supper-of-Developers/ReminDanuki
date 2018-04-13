@@ -1,0 +1,44 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql-super-user
+    volumes:
+      - ./data/db:/var/lib/mysql
+      - ./data/init:/docker-entrypoint-initdb.d
+      - ./data/cnf/multibyte.cnf:/etc/mysql/conf.d/multibyte.cnf
+    ports:
+      - 13306:3306
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    command: redis-server --appendonly yes
+
+  remindanuki:
+    build:
+      context: .
+      dockerfile: ./containers/python/Dockerfile
+    volumes:
+      - ./app:/app
+    environment:
+      - CHANNEL_SECRET=YOUR_CHANNEL_SECRET
+      - ACCESS_TOKEN=YOUR_ACCESS_TOKEN
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASS=mysql-super-user
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=remindanuki
+      - REDIS_URL=redis
+      - REDIS_PORT=6379
+    links:
+      - db
+      - redis
+    ports:
+      - 3000:3000
+    entrypoint:
+      - /bin/sh
+      - -c
+      - crond & gunicorn -b 0.0.0.0:3000 bot:app --log-file=- --log-level=debug --reload

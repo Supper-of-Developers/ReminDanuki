@@ -1,4 +1,4 @@
-# リマインたぬき
+# リマインだぬき(remindanuki)
 
 ## 概要
 
@@ -19,13 +19,11 @@ LINEアプリで下記のQRコードを読み取って友達登録する。
 
 |アーキテクチャ|バージョン等|備考|
 |:--|:--|:--:|
+|Host Machine|Amazon Linux|AWS|
+|Docker|17.03.2-ce||
+|Docker Image|python:alpine3.7</br>mysql:5.7</br>redis:latest||
 |language|python 3.6||
 |SDK|line-bot-sdk-python|[Githubリポジトリ](https://github.com/line/line-bot-sdk-python)
-|Docker|17.03.2-ce||
-|Docker Image|python:alpine3.7||
-|Docker Host|Amazon Linux|AWS|
-|DB|Amazon RDS|MySQL 5.7|
-|Redis|Amazon ElastiCache|Redis|
 
 ## 構成図
 
