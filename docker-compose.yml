@@ -23,6 +23,7 @@ services:
       dockerfile: ./containers/python/Dockerfile
     volumes:
       - ./app:/app
+      - ./logs:/logs
     environment:
       - CHANNEL_SECRET=YOUR_CHANNEL_SECRET
       - ACCESS_TOKEN=YOUR_ACCESS_TOKEN
@@ -41,4 +42,4 @@ services:
     entrypoint:
       - /bin/sh
       - -c
-      - crond & gunicorn -b 0.0.0.0:3000 bot:app --log-file=- --log-level=debug --reload
+      - crond & gunicorn -b 0.0.0.0:3000 bot:app --log-file=/logs/system_log --access-logfile=/logs/access_log --log-level=debug --reload
