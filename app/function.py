@@ -86,7 +86,7 @@ def get_remind_list(send_id):
     Args:
         send_id (str): 送信元ID
     Return:
-        list: list 現在日時から近い予定から最大10件のリスト
+        list: list 現在日時から近い予定から最大5件のリスト
     """
     # mysqlに接続
     mysql_connection = getMysqlPoolConnection()
