@@ -67,6 +67,12 @@ def handle_message(event):
         # DBからその送信元に紐づくリマインダーを現在日時に近いものから最大5件取得する
         remind_list = func.get_remind_list(send_id)
         func.reply_message(event.reply_token, remind_list)
+    elif event.message.text == "おはよう" :
+        func.reply_message(event.reply_token, TextSendMessage(text="おはようぽん！今日１日もキバるで！"))
+    elif event.message.text == "ありがとう":
+        func.reply_message(event.reply_token, TextSendMessage(text="ええでええで〜"))
+    elif event.message.text == "さよなら":
+        func.reply_message(event.reply_token, TextSendMessage(text="おおきに！いつでも呼んだってなぽん！"))
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
