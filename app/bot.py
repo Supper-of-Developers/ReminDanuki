@@ -1,4 +1,5 @@
 # coding=utf-8
+import logging
 from flask import Flask, request, abort
 from datetime import datetime
 
@@ -94,6 +95,11 @@ def handle_datetime_postback(event):
     hiduke = remind_at.strftime('%Y年%m月%d日 %H時%M分')
     func.reply_message(event.reply_token, TextSendMessage("了解だぽん！\n" + hiduke + "に「" + context + "」のお知らせをするぽん！"))
 
+# Gunicorn用Logger設定
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 # Flask利用のため
 if __name__ == "__main__":
