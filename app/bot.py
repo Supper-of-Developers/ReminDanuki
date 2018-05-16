@@ -56,7 +56,6 @@ def handle_message(event):
     context = ""
     if redis_connection.get(send_id):
         context = redis_connection.get(send_id).decode('utf-8')
-
     if event.message.text == "新しいリマインダ" :
         func.reply_message(event.reply_token, TextSendMessage(text="リマインドして欲しい予定を入力するぽん！\n例：「お買い物」「きつねさんとランチ」「お金の振り込み」"))
     elif context != "" and event.message.text == "キャンセル":
@@ -67,12 +66,18 @@ def handle_message(event):
         # DBからその送信元に紐づくリマインダーを現在日時に近いものから最大5件取得する
         remind_list = func.get_remind_list(send_id)
         func.reply_message(event.reply_token, remind_list)
+    elif "+" in event.message.text or "-" in event.message.text or "×" in event.message.text or "÷" in event.message.text
+        event.message.text = event.message.text.replace("×","*")
+        event.message.text = event.message.text.replace("÷","/")
+        func.reply_message(event.reply_token, TextSendMessage(text="答えは"+str(eval(event.message.text))+"だぽん")) 
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
         # datepickerの作成
         date_picker = func.create_datepicker(event.message.text)
         func.reply_message(event.reply_token, date_picker)
+        
+        
 
 @handler.add(PostbackEvent)
 def handle_datetime_postback(event):
