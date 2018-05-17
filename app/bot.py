@@ -72,6 +72,12 @@ def handle_message(event):
         event.message.text = event.message.text.replace("×","*")
         event.message.text = event.message.text.replace("÷","/")
         func.reply_message(event.reply_token, TextSendMessage(text="答えは"+str(eval(event.message.text))+"だぽん"))
+    elif event.message.text == "おはよう" :
+        func.reply_message(event.reply_token, TextSendMessage(text="おはようぽん！今日１日もキバるで！"))
+    elif event.message.text == "ありがとう":
+        func.reply_message(event.reply_token, TextSendMessage(text="ええでええで〜"))
+    elif event.message.text == "さよなら":
+        func.reply_message(event.reply_token, TextSendMessage(text="おおきに！いつでも呼んだってなぽん！"))
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
