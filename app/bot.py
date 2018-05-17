@@ -67,6 +67,11 @@ def handle_message(event):
         # DBからその送信元に紐づくリマインダーを現在日時に近いものから最大5件取得する
         remind_list = func.get_remind_list(send_id)
         func.reply_message(event.reply_token, remind_list)
+    elif "+" in event.message.text or "-" in event.message.text or "×" in event.message.text or "÷" in event.message.text:
+        # 計算記号が含まれていた場合eval関数を使って結果を出力する
+        event.message.text = event.message.text.replace("×","*")
+        event.message.text = event.message.text.replace("÷","/")
+        func.reply_message(event.reply_token, TextSendMessage(text="答えは"+str(eval(event.message.text))+"だぽん"))
     elif event.message.text == "おはよう" :
         func.reply_message(event.reply_token, TextSendMessage(text="おはようぽん！今日１日もキバるで！"))
     elif event.message.text == "ありがとう":
@@ -79,7 +84,8 @@ def handle_message(event):
         # datepickerの作成
         date_picker = func.create_datepicker(event.message.text)
         func.reply_message(event.reply_token, date_picker)
-
+        
+        
 @handler.add(PostbackEvent)
 def handle_datetime_postback(event):
     """
