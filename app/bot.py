@@ -73,7 +73,7 @@ def handle_message(event):
     elif event.message.text == "お天気":
         #お天気の情報を取得して表示
         forecast_info = weather.weather_infomation()
-        func.reply_message(event.reply_token, TextSendMessage(text = forecast_info))
+        func.reply_message(event.reply_token, TextSendMessage(text = forecast_info +"だぽん"))
         #リプライメッセージを書いてあげる,戻り値を返してあげる
 
     else :
