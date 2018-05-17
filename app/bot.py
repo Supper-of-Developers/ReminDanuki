@@ -16,6 +16,8 @@ import redis
 import config
 import function as func
 
+import weather
+
 app = Flask(__name__)
 
 handler = WebhookHandler(config.CHANNEL_SECRET)
@@ -53,6 +55,7 @@ def handle_message(event):
 
     # redisに接続
     redis_connection = redis.StrictRedis(host=config.REDIS_URL, port=config.REDIS_PORT, db=0)
+
     context = ""
     if redis_connection.get(send_id):
         context = redis_connection.get(send_id).decode('utf-8')
@@ -67,6 +70,12 @@ def handle_message(event):
         # DBからその送信元に紐づくリマインダーを現在日時に近いものから最大5件取得する
         remind_list = func.get_remind_list(send_id)
         func.reply_message(event.reply_token, remind_list)
+    elif event.message.text == "お天気":
+        #お天気の情報を取得して表示
+        forecast_info = weather.weather_infomation()
+        func.reply_message(event.reply_token, TextSendMessage(text = forecast_info))
+        #リプライメッセージを書いてあげる,戻り値を返してあげる
+
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
