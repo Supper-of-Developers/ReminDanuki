@@ -1,7 +1,8 @@
 # coding=utf-8
 from flask import Flask, request, abort
 from datetime import datetime
-
+from pytz import timezone
+import pytz
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -14,6 +15,8 @@ from linebot.models import (
 import redis
 import config
 import function as func
+import random
+
 
 app = Flask(__name__)
 
@@ -66,6 +69,10 @@ def handle_message(event):
         # DBからその送信元に紐づくリマインダーを現在日時に近いものから最大5件取得する
         remind_list = func.get_remind_list(send_id)
         func.reply_message(event.reply_token, remind_list)
+    elif "今" in event.message.text and "時間" in event.message.text:
+        random_timezone = random.choice(list(timezone_list.keys()))
+        now_date = datetime.now(timezone(timezone_list[random_timezone])).strftime("%H時%M分")
+        func.reply_message(event.reply_token, TextSendMessage(text="僕は"+random_timezone+"に遊びに来ているぽん！今は"+str(now_date)+"だぽん！"))
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
