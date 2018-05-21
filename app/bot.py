@@ -17,7 +17,6 @@ import config
 import function as func
 import random
 
-
 app = Flask(__name__)
 
 handler = WebhookHandler(config.CHANNEL_SECRET)
