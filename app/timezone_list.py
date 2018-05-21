@@ -1,5 +1,4 @@
-from pytz import timezone
-import pytz
+# coding=utf-8
 
 timezone_list = {
             "北京":"Asia/Shanghai",

@@ -16,6 +16,7 @@ import redis
 import config
 import function as func
 import random
+import timezone_list
 
 app = Flask(__name__)
 
@@ -69,8 +70,8 @@ def handle_message(event):
         remind_list = func.get_remind_list(send_id)
         func.reply_message(event.reply_token, remind_list)
     elif "今" in event.message.text and "時間" in event.message.text:
-        random_timezone = random.choice(list(timezone_list.keys()))
-        now_date = datetime.now(timezone(timezone_list[random_timezone])).strftime("%H時%M分")
+        random_timezone = random.choice(list(timezone_list.timezone_list.keys()))
+        now_date = datetime.now(timezone(timezone_list.timezone_list[random_timezone])).strftime("%H時%M分")
         func.reply_message(event.reply_token, TextSendMessage(text="僕は"+random_timezone+"に遊びに来ているぽん！今は"+str(now_date)+"だぽん！"))
     else :
         # redisにコンテキストを保存
