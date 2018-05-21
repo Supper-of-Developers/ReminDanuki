@@ -2,7 +2,8 @@
 import logging
 from flask import Flask, request, abort
 from datetime import datetime
-
+from pytz import timezone
+import pytz
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -15,6 +16,8 @@ from linebot.models import (
 import redis
 import config
 import function as func
+import random
+import timezone_list
 
 import weather
 
@@ -73,13 +76,29 @@ def handle_message(event):
         #お天気の情報を取得して表示
         weather_info = weather.weather_infomation()
         func.reply_message(event.reply_token, TextSendMessage(text = weather_info +"だぽん"))
+    elif "今" in event.message.text and "時間" in event.message.text:
+        random_timezone = random.choice(list(timezone_list.timezone_list.keys()))
+        now_date = datetime.now(timezone(timezone_list.timezone_list[random_timezone])).strftime("%H時%M分")
+        func.reply_message(event.reply_token, TextSendMessage(text="僕は"+random_timezone+"に遊びに来ているぽん！今は"+str(now_date)+"だぽん！"))
+    elif "+" in event.message.text or "-" in event.message.text or "×" in event.message.text or "÷" in event.message.text:
+        # 計算記号が含まれていた場合eval関数を使って結果を出力する
+        event.message.text = event.message.text.replace("×","*")
+        event.message.text = event.message.text.replace("÷","/")
+        func.reply_message(event.reply_token, TextSendMessage(text="答えは"+str(eval(event.message.text))+"だぽん"))
+    elif event.message.text == "おはよう" :
+        func.reply_message(event.reply_token, TextSendMessage(text="おはようぽん！今日１日もキバるで！"))
+    elif event.message.text == "ありがとう":
+        func.reply_message(event.reply_token, TextSendMessage(text="ええでええで〜"))
+    elif event.message.text == "さよなら":
+        func.reply_message(event.reply_token, TextSendMessage(text="おおきに！いつでも呼んだってなぽん！"))
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
         # datepickerの作成
         date_picker = func.create_datepicker(event.message.text)
         func.reply_message(event.reply_token, date_picker)
-
+        
+        
 @handler.add(PostbackEvent)
 def handle_datetime_postback(event):
     """
