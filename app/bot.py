@@ -71,8 +71,8 @@ def handle_message(event):
         func.reply_message(event.reply_token, remind_list)
     elif event.message.text == "お天気":
         #お天気の情報を取得して表示
-        forecast_info = weather.weather_infomation()
-        func.reply_message(event.reply_token, TextSendMessage(text = forecast_info +"だぽん"))
+        weather_info = weather.weather_infomation()
+        func.reply_message(event.reply_token, TextSendMessage(text = weather_info +"だぽん"))
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
