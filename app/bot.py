@@ -74,7 +74,7 @@ def handle_message(event):
         func.reply_message(event.reply_token, remind_list)
     elif event.message.text == "お天気":
         #お天気の情報を取得して表示
-        weather_info = weather.weather_infomation()
+        weather_info = weather.weather_information()
         func.reply_message(event.reply_token, TextSendMessage(text = weather_info +"だぽん"))
     elif "今" in event.message.text and "時間" in event.message.text:
         random_timezone = random.choice(list(timezone_list.timezone_list.keys()))

@@ -2,7 +2,7 @@ import urllib3
 import json
 
 #お天気の情報を取得
-def weather_infomation():
+def weather_information():
     http = urllib3.PoolManager()
     r = http.request('Get','http://weather.livedoor.com/forecast/webservice/json/v1?city=130010')
     r = json.loads(r._body)
