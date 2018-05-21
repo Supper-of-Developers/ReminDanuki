@@ -55,7 +55,6 @@ def handle_message(event):
 
     # redisに接続
     redis_connection = redis.StrictRedis(host=config.REDIS_URL, port=config.REDIS_PORT, db=0)
-
     context = ""
     if redis_connection.get(send_id):
         context = redis_connection.get(send_id).decode('utf-8')
@@ -74,8 +73,6 @@ def handle_message(event):
         #お天気の情報を取得して表示
         forecast_info = weather.weather_infomation()
         func.reply_message(event.reply_token, TextSendMessage(text = forecast_info +"だぽん"))
-        #リプライメッセージを書いてあげる,戻り値を返してあげる
-
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)

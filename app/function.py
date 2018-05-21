@@ -200,4 +200,3 @@ def insert_reminder(mysql_connection, cursor, sender_id, context, remind_at):
     """
     cursor.execute('INSERT INTO reminders (sender_id, text, remind_at) VALUES (%s, %s, %s);', (sender_id, context, remind_at))
     mysql_connection.commit()
-

@@ -6,7 +6,6 @@ http = urllib3.PoolManager()
 r = http.request('Get','http://weather.livedoor.com/forecast/webservice/json/v1?city=130010')
 r = json.loads(r._body)
 
-
 date = r['forecasts'][0]['date']
 weather = r['forecasts'][0]['telop']
 
