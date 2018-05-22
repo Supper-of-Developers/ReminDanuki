@@ -104,7 +104,9 @@ def handle_follow(event):
     # print(rich_menu_obj.rich_menu_id)
     rmm.apply(send_id, rich_menu_id)
     
-    
+    # メッセージ送信
+    func.reply_message(event.reply_token, TextSendMessage(text="フォローありがとうだぽん！(ʃƪ ˘ ³˘) (˘ε ˘ ʃƪ)♡ \n私は「リマインダヌキ」だぽん！\n必要な時はいつでも呼んでぽんね！"))
+
 
 @handler.add(PostbackEvent)
 def handle_datetime_postback(event):
