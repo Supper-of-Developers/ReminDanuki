@@ -2,7 +2,9 @@
 import logging
 from flask import Flask, request, abort
 from datetime import datetime
-
+from pytz import timezone
+import pytz
+import random
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -15,10 +17,11 @@ from linebot.models import (
 import redis
 import config
 import function as func
+import timezone_list
+import weather
 from richmenu import RichMenu, RichMenuManager
 
 line_bot_api = LineBotApi(config.ACCESS_TOKEN)
-
 
 app = Flask(__name__)
 
@@ -71,6 +74,19 @@ def handle_message(event):
         # DBからその送信元に紐づくリマインダーを現在日時に近いものから最大5件取得する
         remind_list = func.get_remind_list(send_id)
         func.reply_message(event.reply_token, remind_list)
+    elif event.message.text == "お天気":
+        #お天気の情報を取得して表示
+        weather_info = weather.weather_information()
+        func.reply_message(event.reply_token, TextSendMessage(text = weather_info +"だぽん"))
+    elif "今" in event.message.text and "時間" in event.message.text:
+        random_timezone = random.choice(list(timezone_list.timezone_list.keys()))
+        now_date = datetime.now(timezone(timezone_list.timezone_list[random_timezone])).strftime("%H時%M分")
+        func.reply_message(event.reply_token, TextSendMessage(text="僕は"+random_timezone+"に遊びに来ているぽん！今は"+str(now_date)+"だぽん！"))
+    elif "+" in event.message.text or "-" in event.message.text or "×" in event.message.text or "÷" in event.message.text:
+        # 計算記号が含まれていた場合eval関数を使って結果を出力する
+        event.message.text = event.message.text.replace("×","*")
+        event.message.text = event.message.text.replace("÷","/")
+        func.reply_message(event.reply_token, TextSendMessage(text="答えは"+str(eval(event.message.text))+"だぽん"))
     elif event.message.text == "おはよう" :
         func.reply_message(event.reply_token, TextSendMessage(text="おはようぽん！今日１日もキバるで！"))
     elif event.message.text == "ありがとう":
@@ -107,7 +123,7 @@ def handle_follow(event):
     # メッセージ送信
     func.reply_message(event.reply_token, TextSendMessage(text="フォローありがとうだぽん！(ʃƪ ˘ ³˘) (˘ε ˘ ʃƪ)♡ \n私は「リマインダヌキ」だぽん！\n必要な時はいつでも呼んでぽんね！"))
 
-
+      
 @handler.add(PostbackEvent)
 def handle_datetime_postback(event):
     """
@@ -139,5 +155,3 @@ if __name__ != '__main__':
 # Flask利用のため
 if __name__ == "__main__":
     app.run(port=3000)
-
-

@@ -1,3 +1,4 @@
 data/db/*
 logs/*
 !.gitkeep
+app/__pycache__
