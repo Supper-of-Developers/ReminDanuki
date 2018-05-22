@@ -4,6 +4,7 @@ from flask import Flask, request, abort
 from datetime import datetime
 from pytz import timezone
 import pytz
+import random
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -11,15 +12,16 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, PostbackEvent, Postback, TemplateSendMessage, ButtonsTemplate, DatetimePickerTemplateAction
+    MessageEvent, TextMessage, TextSendMessage, PostbackEvent, Postback, TemplateSendMessage, ButtonsTemplate, DatetimePickerTemplateAction,FollowEvent
 )
 import redis
 import config
 import function as func
-import random
 import timezone_list
-
 import weather
+from richmenu import RichMenu, RichMenuManager
+
+line_bot_api = LineBotApi(config.ACCESS_TOKEN)
 
 app = Flask(__name__)
 
@@ -91,14 +93,37 @@ def handle_message(event):
         func.reply_message(event.reply_token, TextSendMessage(text="ええでええで〜"))
     elif event.message.text == "さよなら":
         func.reply_message(event.reply_token, TextSendMessage(text="おおきに！いつでも呼んだってなぽん！"))
+    elif event.message.text == "リマインダヌキ":
+        func.reply_message(event.reply_token, TextSendMessage(text="私は「リマインダヌキ」だぽん!\nリマインドして欲しいことをラインしたらお知らせするんだぽん!\nさらに、簡単な会話もできるんだぽん!!(੭•̀ᴗ•̀)੭"))
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
         # datepickerの作成
         date_picker = func.create_datepicker(event.message.text)
         func.reply_message(event.reply_token, date_picker)
-        
-        
+
+
+@handler.add(FollowEvent)
+def handle_follow(event):
+    """
+    followイベントを受け取るmethod
+    Args:
+        event (linebot.models.events.FollowEvent): LINE Webhookイベントオブジェクト
+    """
+    # 送信元
+    send_id = func.get_send_id(event)
+    
+    rich_menu_id = 'richmenu-0a44bd1d889f7b4fe01e8558002429a8'
+    rmm = RichMenuManager(config.ACCESS_TOKEN)
+
+    # rich_menu_object = line_bot_api.get_rich_menu(rich_menu_id)
+    # print(rich_menu_obj.rich_menu_id)
+    rmm.apply(send_id, rich_menu_id)
+    
+    # メッセージ送信
+    func.reply_message(event.reply_token, TextSendMessage(text="フォローありがとうだぽん！(ʃƪ ˘ ³˘) (˘ε ˘ ʃƪ)♡ \n私は「リマインダヌキ」だぽん！\n必要な時はいつでも呼んでぽんね！"))
+
+      
 @handler.add(PostbackEvent)
 def handle_datetime_postback(event):
     """
@@ -119,6 +144,7 @@ def handle_datetime_postback(event):
     # 登録完了メッセージを返す
     hiduke = remind_at.strftime('%Y年%m月%d日 %H時%M分')
     func.reply_message(event.reply_token, TextSendMessage("了解だぽん！\n" + hiduke + "に「" + context + "」のお知らせをするぽん！"))
+
 
 # Gunicorn用Logger設定
 if __name__ != '__main__':
