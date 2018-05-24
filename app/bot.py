@@ -61,12 +61,14 @@ def handle_message(event):
     # redisに接続
     redis_connection = redis.StrictRedis(host=config.REDIS_URL, port=config.REDIS_PORT, db=0)
     context = ""
+    new_reminders = ["新しいリマインダ","追加","予定","ついか","よてい","新規作成"]
+    canceled_reminders = ["やめる","もういい","削除","いらない","キャンセル","やっぱりやめる"]
     if redis_connection.get(send_id):
         context = redis_connection.get(send_id).decode('utf-8')
 
-    if event.message.text == "新しいリマインダ" :
+    if event.message.text in new_reminders:
         func.reply_message(event.reply_token, TextSendMessage(text="リマインドして欲しい予定を入力するぽん！\n例：「お買い物」「きつねさんとランチ」「お金の振り込み」"))
-    elif context != "" and event.message.text == "キャンセル":
+    elif context != "" and event.message.text in canceled_reminders:
         # redisのコンテキストを削除
         redis_connection.delete(send_id)
         func.reply_message(event.reply_token, TextSendMessage(text="また何かあったら言って欲しいたぬ～"))
