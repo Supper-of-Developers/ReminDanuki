@@ -231,11 +231,11 @@ def insert_reminder(mysql_connection, cursor, sender_id, context, remind_at):
     cursor.execute('INSERT INTO reminders (sender_id, text, remind_at) VALUES (%s, %s, %s);', (sender_id, context, remind_at))
     mysql_connection.commit()
 
-def cancel_reminder(event,id):
+def cancel_reminder(id):
     """リマインダ削除用メソッド
     Args:
-        event (linebot.models.events.MessageEvent): LINE Webhookイベントオブジェクト
-        id 
+        id (dict)  parse_pbd = urllib.parse.parse_qs(postback_data)
+                   id=parse_pbd["reminders_id"] カルーセルメッセージオブジェクトに紐づけられたid
     Returns:
         str: delete_text 削除したリマインダーテキスト
     """
@@ -245,16 +245,19 @@ def cancel_reminder(event,id):
     #完了メッセージに表示するため削除前にテキストを保持しておく
     cursor.execute("SELECT text FROM reminders WHERE id = %s", (id,))
     row = cursor.fetchone() 
-    delete_text = row["text"]
+    #mysqlから切断
+    cursor.close()
+    mysql_connection.close()  
     #データベースに対象の予定があれば削除する
-    if delete_text != None:
+    if　row :
+        delete_text = row["text"]
         delete_reminder(mysql_connection,cursor,id)
-        #mysqlから切断
-        cursor.close()
-        mysql_connection.close()
-        
         return delete_text
-        
+    else :
+        return "その予定は既にわすれたぬ。"
+
+
+              
 def delete_reminder(mysql_connection, cursor, id):
     """リマインダ削除SQL実行用メソッド
     Args:
@@ -319,10 +322,9 @@ def update_datetime_reminder(event, new_remind_at, id):
     return "時刻を更新したぽん！"
 
 
-def update_contents_reminder(event, new_context, id):
+def update_contents_reminder(new_context, id):
     """登録したリマインダーの内容を更新するメソッド
     Args:
-        event (linebot.models.events.MessageEvent): LINE Webhookイベントオブジェクト
         new_context 更新フロー中に入力された新しい予定内容
         id (dict)  parse_pbd = urllib.parse.parse_qs(postback_data)
                    id=parse_pbd["reminders_id"] カルーセルメッセージオブジェクトに紐づけられたid
