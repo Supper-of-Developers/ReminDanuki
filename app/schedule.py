@@ -13,8 +13,6 @@ line_bot_api = LineBotApi(config.ACCESS_TOKEN)
 # mysqlに接続
 mysql_connection = func.getMysqlPoolConnection()
 cursor = mysql_connection.cursor(dictionary=True)
-# 現在日時を取得
-now_date = datetime.now(timezone('Asia/Tokyo')).strftime("%Y-%m-%d 00:00:00")
 
 #データを取得
 sql = "SELECT send_id, text, remind_at FROM reminders, senders WHERE reminders.sender_id = senders.id AND remind_at >= CURRENT_DATE() AND remind_at < date_add(CURRENT_DATE(), INTERVAL 1 DAY) ORDER BY remind_at ASC ;"
