@@ -3,6 +3,7 @@ CREATE DATABASE remindanuki;
 CREATE TABLE `remindanuki`.`senders` (
   id INT NOT NULL AUTO_INCREMENT
   ,send_id VARCHAR(64) NOT NULL
+  ,calendar_id VARCHAR(255)
   ,created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   ,primary key(id)
   ,index(send_id)
