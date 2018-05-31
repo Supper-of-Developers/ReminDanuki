@@ -7,6 +7,7 @@ from apiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
 import datetime
+import re
 from pytz import timezone
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, PostbackEvent, Postback, TemplateSendMessage, ButtonsTemplate, DatetimePickerTemplateAction,FollowEvent
@@ -14,11 +15,18 @@ from linebot.models import (
 import random
 import function as func
 
-def formatEventDateToJapanese(date_str):
+def formatEventDateToJapanese(date_str, timing):
     if ":" == date_str[-3:-2]:
         date_str = date_str[:-3]+date_str[-2:]
-    date = datetime.datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S%z')
-    return date.strftime('%H:%M') 
+    elif re.match('^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$', date_str) :
+        if timing == 0:
+            date_str = '朝'
+        else :
+            date_str = '夜'
+    else :
+        date = datetime.datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S%z')
+        date_str = date.strftime('%H:%M') 
+    return date_str 
 
 SCOPES = 'https://www.googleapis.com/auth/calendar'
 CLIENT_SECRET_FILE = './client_secret.json'
@@ -37,6 +45,8 @@ def getCal(send_id):
     min = datetime.datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%dT00:00:00%z') # 'Z' indicates UTC time
     max = datetime.datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%dT23:59:59%z')
     cal_id=func.select_calendar_id(send_id)
+    if cal_id == "":
+        return TextSendMessage(text="GoogleIDが未登録だぽん！\n先に「カレンダー」と入力してIDを登録して欲しいたぬ～")
     print('Getting the upcoming 10 events')
     events_result = service.events().list(calendarId=cal_id, timeMin=min,timeMax=max,
                                           maxResults=10, singleEvents=True,
@@ -56,8 +66,8 @@ def getCal(send_id):
         # calendarlist = "\n今日の予定がないぽん！"   
         msg='\n今日の予定がないぽん！'
     for event in events:
-        start = formatEventDateToJapanese(event['start'].get('dateTime', event['start'].get('date')))
-        end = formatEventDateToJapanese(event['end'].get('dateTime',event['end'].get('date')))
+        start = formatEventDateToJapanese(event['start'].get('dateTime', event['start'].get('date')), 0)
+        end = formatEventDateToJapanese(event['end'].get('dateTime',event['end'].get('date')), 1)
         # calendarlist.append(TextSendMessage(text=start + "~" + end + ": "+ event['summary']))
         msg += "\n" + start + " ~ " + end + " : 【"+ event['summary']+ "】  "
         print(start, event['summary'])
