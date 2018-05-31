@@ -255,9 +255,7 @@ def cancel_reminder(id):
         return delete_text
     else :
         return "その予定は既にわすれたぬ。"
-
-
-              
+  
 def delete_reminder(mysql_connection, cursor, id):
     """リマインダ削除SQL実行用メソッド
     Args:
@@ -321,7 +319,6 @@ def update_datetime_reminder(event, new_remind_at, id):
     
     return "時刻を更新したぽん！"
 
-
 def update_contents_reminder(new_context, id):
     """登録したリマインダーの内容を更新するメソッド
     Args:
@@ -345,5 +342,15 @@ def update_contents_reminder(new_context, id):
     
     return "予定を更新したぽん！"
 
+def get_sql_send_id():
+    # mysqlに接続
+    mysql_connection = getMysqlPoolConnection()
+    cursor = mysql_connection.cursor(dictionary=True)
     
-    
+    sql = "SELECT send_id FROM senders;"
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    # mysqlから切断
+    cursor.close()
+    mysql_connection.close()
+    return rows
