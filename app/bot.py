@@ -65,7 +65,7 @@ def handle_message(event):
         # redisのコンテキストを削除
         redis_connection.delete(send_id)
         func.reply_message(event.reply_token, TextSendMessage(text="また何かあったら言って欲しいたぬ～"))
-    elif event.message.text == "一覧":
+    elif event.message.text == "一覧を見る":
         # DBからその送信元に紐づくリマインダーを現在日時に近いものから最大10件取得する
         remind_list = func.get_remind_list(send_id)
         func.reply_message(event.reply_token, remind_list)
