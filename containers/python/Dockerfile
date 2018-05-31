@@ -3,7 +3,7 @@ FROM python:alpine3.7
 LABEL maintainer K.Naito
 
 RUN pip install --upgrade pip \
-    && pip install flask gunicorn line-bot-sdk redis mysql-connector-python-rf pytz sqlalchemy \
+    && pip install flask gunicorn line-bot-sdk redis mysql-connector-python-rf pytz sqlalchemy google-api-python-client \
     && mkdir /app \
     && apk add --update busybox-suid
 

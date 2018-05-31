@@ -22,6 +22,7 @@ from pytz import timezone
 import timezone_list
 import weather
 from richmenu import RichMenu, RichMenuManager
+import googlecal
 
 line_bot_api = LineBotApi(config.ACCESS_TOKEN)
 
@@ -70,6 +71,14 @@ def handle_message(event):
    
     if event.message.text in new_reminders:
         func.reply_message(event.reply_token, TextSendMessage(text="リマインドして欲しい予定を入力するぽん！\n例：「お買い物」「きつねさんとランチ」「お金の振り込み」"))
+    elif context == "カレンダーID登録中":
+        calendar_id = event.message.text
+        if '@gmail.com' in calendar_id :
+            func.update_calendar_id(send_id,calendar_id)
+            redis_connection.delete(send_id)
+            func.reply_message(event.reply_token, TextSendMessage(text="登録完了だぽん！\nカレンダーの設定を公開にしてくださいぽん！"))
+        else : 
+            func.reply_message(event.reply_token, TextSendMessage(text="GoogleIDじゃないぽん！！\nもう一度GoogleIDを登録してくださいたぬ！"))
     elif context != "" and event.message.text in canceled_reminders:
         # redisのコンテキストを削除
         redis_connection.delete(send_id)
@@ -107,7 +116,13 @@ def handle_message(event):
     elif event.message.text == "さよなら":
         func.reply_message(event.reply_token, TextSendMessage(text="おおきに！いつでも呼んだってなぽん！"))
     elif event.message.text == "リマインダヌキ":
-        func.reply_message(event.reply_token, TextSendMessage(text="私は「リマインダヌキ」だぽん!\nリマインドして欲しいことをラインしたらお知らせするんだぽん!\nさらに、簡単な会話もできるんだぽん!!(੭•̀ᴗ•̀)੭"))
+        func.reply_message(event.reply_token, TextSendMessage(text="僕は「リマインダヌキ」だぽん!\nリマインドして欲しいことをラインしたらお知らせするんだぽん!\nでも、僕は日本にいないだぽん!! ◟( ˘ ³˘)◞  → 詳しくは「今時間」入力"))
+    elif event.message.text == "カレンダー":
+        redis_connection.set(send_id,"カレンダーID登録中")
+        func.reply_message(event.reply_token, TextSendMessage(text="GoogleIDを入力してくださいたぬ〜"))
+    elif event.message.text == "今日の予定":
+        cal = googlecal.getCal(send_id)
+        func.reply_message(event.reply_token,cal)
     else :
         # redisにコンテキストを保存
         redis_connection.set(send_id, event.message.text)
@@ -134,7 +149,7 @@ def handle_follow(event):
     # print(rich_menu_obj.rich_menu_id)
     rmm.apply(send_id, rich_menu_id)
     
-    # メッセージ送信
+    # フォローメッセージ送信
     func.reply_message(event.reply_token, TextSendMessage(text="フォローありがとうだぽん！(ʃƪ ˘ ³˘) (˘ε ˘ ʃƪ)♡ \n私は「リマインダヌキ」だぽん！\n必要な時はいつでも呼んでぽんね！"))
 
       

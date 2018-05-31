@@ -231,6 +231,42 @@ def insert_reminder(mysql_connection, cursor, sender_id, context, remind_at):
     cursor.execute('INSERT INTO reminders (sender_id, text, remind_at) VALUES (%s, %s, %s);', (sender_id, context, remind_at))
     mysql_connection.commit()
 
+def update_calendar_id(send_id,calendar_id):
+    """
+    カレンダーID登録SQL実行method
+    Args:
+        mysql_connection (mysql.connector.connect): MySQLコネクター
+        cursor (mysql.connector.connect.cursor): MySQLカーソル
+        send_id (str): 送信元ID
+        calendar_id: 登録するgoogleカレンダーID
+    """
+    # mysqlに接続
+    mysql_connection = getMysqlPoolConnection()
+    cursor = mysql_connection.cursor(dictionary=True)
+    
+    # 送信元IDのgoogleカレンダーIDを登録
+    cursor.execute('UPDATE senders SET calendar_id = %s WHERE send_id = %s;', (calendar_id,send_id,))
+    mysql_connection.commit()
+
+def select_calendar_id(send_id):
+    """
+    カレンダーID取得method
+    Args:
+        mysql_connection (mysql.connector.connect): MySQLコネクター
+        cursor (mysql.connector.connect.cursor): MySQLカーソル
+        send_id (str): 送信元ID
+    Return:
+        calendar_id: 登録するgoogleカレンダーID
+    """
+    # googleカレンダーIDを取得
+    cursor.execute('SELECT calendar_id FROM senders WHERE send_id = %s;',(send_id,))
+    row = cursor.fetchone()
+    calendar_id=""
+    if row :
+        calendar_id=row['calendar_id']
+
+    return calendar_id
+
 def cancel_reminder(id):
     """リマインダ削除用メソッド
     Args:
@@ -343,6 +379,10 @@ def update_contents_reminder(new_context, id):
     return "予定を更新したぽん！"
 
 def get_sql_send_id():
+    """登録されているsend_idの一覧を返すメソッド
+    Returns:
+        rows: 登録されている全send_idのdict
+    """
     # mysqlに接続
     mysql_connection = getMysqlPoolConnection()
     cursor = mysql_connection.cursor(dictionary=True)
