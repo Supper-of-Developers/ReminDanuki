@@ -11,6 +11,8 @@ import mysql.connector
 import sqlalchemy.pool as pool
 import redis
 import config
+import urllib3
+import json
 
 line_bot_api = LineBotApi(config.ACCESS_TOKEN)
 
@@ -213,3 +215,21 @@ def get_sql_send_id():
     cursor.close()
     mysql_connection.close()
     return rows
+
+    #お天気の情報を取得
+def weather_information():
+    http = urllib3.PoolManager()
+    r = http.request('Get','http://weather.livedoor.com/forecast/webservice/json/v1?city=130010')
+    r = json.loads(r._body)
+
+    date = r['forecasts'][0]['dateLabel']
+    weather = r['forecasts'][0]['telop']
+    validate_temp = r['forecasts'][0]['temperature']['max']
+    #時間帯によって最高気温がnullになるためif文で確認
+    if  validate_temp is not None:
+        temp = r['forecasts'][0]['temperature']['max']['celsius'] 
+        weather_news = date + "の東京の天気は" + weather + "\n" + "最高気温は" + temp + "度だぽん"
+        return weather_news 
+    else :
+        weather_news = date + "の東京の天気は" + weather +  "だぽん"
+        return weather_news

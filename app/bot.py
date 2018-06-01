@@ -18,7 +18,6 @@ import redis
 import config
 import function as func
 import timezone_list
-import weather
 from richmenu import RichMenu, RichMenuManager
 
 line_bot_api = LineBotApi(config.ACCESS_TOKEN)
@@ -78,7 +77,7 @@ def handle_message(event):
         func.reply_message(event.reply_token, remind_list)
     elif event.message.text == "お天気":
         #お天気の情報を取得して表示
-        weather_info = weather.weather_information()
+        weather_info = func.weather_information()
         func.reply_message(event.reply_token, TextSendMessage(text = weather_info +"だぽん"))
     elif "今" in event.message.text and "時間" in event.message.text:
         random_timezone = random.choice(list(timezone_list.timezone_list.keys()))
@@ -90,7 +89,7 @@ def handle_message(event):
         event.message.text = event.message.text.replace("÷","/")
         func.reply_message(event.reply_token, TextSendMessage(text="答えは"+str(eval(event.message.text))+"だぽん"))
     elif event.message.text == "おはよう" :
-        weather_info = weather.weather_information()
+        weather_info = func.weather_information()
         func.reply_message(event.reply_token, TextSendMessage(text="おはようぽん！今日１日もキバるで！" +"\n"+ weather_info +"だぽん"))
     elif event.message.text == "ありがとう":
         func.reply_message(event.reply_token, TextSendMessage(text="ええでええで〜"))
